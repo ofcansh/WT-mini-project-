@@ -1,0 +1,66 @@
+# Import libraries
+import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+# Load Iris dataset
+pd = pd.read_csv('Iris.csv')
+
+# Show first 5 rows
+pd.head()
+print(pd.dtypes)
+
+# Histogram
+plt.hist(pd['SepalLengthCm'], bins=20, color='skyblue')
+plt.title('Histogram of Sepal Length')
+plt.xlabel('Sepal Length')
+plt.ylabel('Frequency')
+plt.show()
+
+# Boxplot
+sns.boxplot(x=pd['SepalLengthCm'], color='skyblue')
+plt.title('Boxplot of Sepal Length')
+plt.show()
+
+# Histogram
+plt.hist(pd['SepalWidthCm'], bins=20, color='lightgreen')
+plt.title('Histogram of Sepal Width')
+plt.xlabel('Sepal Width')
+plt.ylabel('Frequency')
+plt.show()
+
+# Boxplot
+sns.boxplot(x=pd['SepalWidthCm'], color='lightgreen')
+plt.title('Boxplot of Sepal Width')
+plt.show()
+
+# Histogram
+plt.hist(pd['PetalLengthCm'], bins=20, color='salmon')
+plt.title('Histogram of Petal Length')
+plt.xlabel('Petal Length')
+plt.ylabel('Frequency')
+plt.show()
+
+# Boxplot
+sns.boxplot(x=pd['PetalLengthCm'], color='salmon')
+plt.title('Boxplot of Petal Length')
+plt.show()
+
+# Histogram
+plt.hist(pd['PetalWidthCm'], bins=20, color='violet')
+plt.title('Histogram of Petal Width')
+plt.xlabel('Petal Width')
+plt.ylabel('Frequency')
+plt.show()
+
+# Boxplot
+sns.boxplot(x=pd['PetalWidthCm'], color='violet')
+plt.title('Boxplot of Petal Width')
+plt.show()
+
+print("""
+Observations:
+- Sepal Width shows a few outliers.
+- Sepal Length, Petal Length, Petal Width distributions are mostly normal.
+- Petal measurements are tighter and smaller in range compared to Sepal measurements.
+""")

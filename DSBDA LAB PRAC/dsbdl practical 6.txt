@@ -1,0 +1,46 @@
+import pandas as pd
+import numpy as np
+import seaborn as sns
+import matplotlib.pyplot as plt
+from sklearn.model_selection import train_test_split
+from sklearn.naive_bayes import GaussianNB
+from sklearn.metrics import confusion_matrix,accuracy_score,precision_score,recall_score,f1_score
+from sklearn.preprocessing import StandardScaler
+
+df=pd.read_csv('Iris.csv')
+print(df.head())
+
+x=df.drop(columns=['Species'])
+y=df['Species']
+
+x_train,x_test,y_train,y_test=train_test_split(x,y,test_size=0.2,random_state=45)
+print(f"Training data shape: {x_train.shape}")
+print(f"Testing data shape: {x_test.shape}")
+
+
+scaler=StandardScaler()
+x_train=scaler.fit_transform(x_train)
+x_test=scaler.fit_transform(x_test)
+
+model=GaussianNB()
+model.fit(x_train,y_train)
+
+y_pred=model.predict(x_test)
+
+cm=confusion_matrix(y_test,y_pred)
+
+
+
+accuracy=accuracy_score(y_test,y_pred)
+error_rate=1-accuracy
+precision=precision_score(y_test,y_pred,average='weighted')
+recall=recall_score(y_test,y_pred,average='weighted')
+f1=f1_score(y_test,y_pred,average='weighted')
+
+print(f"Confusion Matrix:\n{cm}")
+print(f"Accuracy: {accuracy:.2f}")
+print(f"Error Rate: {error_rate:.2f}")
+print(f"Precision: {precision:.2f}")
+print(f"Recall: {recall:.2f}")
+print(f"F1 Score: {f1:.2f}")
+

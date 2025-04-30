@@ -1,0 +1,55 @@
+11
+val numbers = sc.parallelize(Seq(-5, 3, 0, -10, 7, 0, 5))
+
+val classification = numbers.map(num => {
+  if (num > 0) {
+    (num, "Positive")
+  } else if (num < 0) {
+    (num, "Negative")
+  } else {
+    (num, "Zero")
+  }
+})
+
+classification.collect().foreach {
+  case (num, category) => println(s"Number $num is $category")
+}
+
+
+12
+val operations = sc.parallelize(Seq(
+  ("Addition", 5, 3),
+  ("Subtraction", 5, 3),
+  ("Multiplication", 5, 3),
+  ("Division", 6, 3)
+))
+
+val results = operations.map {
+  case ("Addition", a, b) => (a + b, "Addition")
+  case ("Subtraction", a, b) => (a - b, "Subtraction")
+  case ("Multiplication", a, b) => (a * b, "Multiplication")
+  case ("Division", a, b) => if (b != 0) (a / b, "Division") else (Double.NaN, "Division by Zero")
+}
+
+results.collect().foreach {
+  case (result, operation) => println(s"$operation result: $result")
+}
+
+13
+val numbers = sc.parallelize(1 to 50)
+
+val isPrime = numbers.map(num => {
+  def checkPrime(n: Int): Boolean = {
+    if (n <= 1) return false
+    for (i <- 2 until n) {
+      if (n % i == 0) return false
+    }
+    true
+  }
+  
+  (num, checkPrime(num))
+})
+
+isPrime.filter(_._2).collect().foreach {
+  case (num, prime) => println(s"$num is Prime")
+}

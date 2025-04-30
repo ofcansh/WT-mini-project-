@@ -1,0 +1,194 @@
+Got it — you want **another complete project**, similar to WordCount,  
+but this time for **processing system log files** using **MapReduce** in Java.
+
+✅ Code like before (with Mapper, Reducer, Driver)  
+✅ Run on **local standalone Hadoop setup**  
+✅ Full example (input sample + expected output)
+
+---
+
+# 🛠 Project Goal: **Log Analyzer using Hadoop MapReduce**
+
+Suppose you have a server log file like:
+```
+ERROR Connection refused
+INFO  User login successful
+ERROR Disk not found
+WARNING CPU usage high
+INFO  User logout
+ERROR Disk not found
+```
+
+We want to **count how many times each type of log level** appears:  
+(`INFO`, `WARNING`, `ERROR`, etc.)
+
+---
+
+# 🛠 Code for LogProcessor.java
+
+👉 **Create a new Java class in Eclipse**: `LogProcessor.java`
+
+(inside a package `logprocessor`)
+
+```java
+package logprocessor;
+
+import java.io.IOException;
+import java.util.StringTokenizer;
+
+import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.fs.Path;
+import org.apache.hadoop.io.IntWritable;
+import org.apache.hadoop.io.Text;
+import org.apache.hadoop.mapreduce.Job;
+import org.apache.hadoop.mapreduce.Mapper;
+import org.apache.hadoop.mapreduce.Reducer;
+import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
+import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
+
+public class LogProcessor {
+
+    public static class LogMapper extends Mapper<Object, Text, Text, IntWritable> {
+        private final static IntWritable one = new IntWritable(1);
+        private Text logLevel = new Text();
+        
+        public void map(Object key, Text value, Context context) throws IOException, InterruptedException {
+            String line = value.toString();
+            StringTokenizer tokenizer = new StringTokenizer(line);
+            if (tokenizer.hasMoreTokens()) {
+                String level = tokenizer.nextToken();
+                logLevel.set(level);
+                context.write(logLevel, one);
+            }
+        }
+    }
+
+    public static class LogReducer extends Reducer<Text, IntWritable, Text, IntWritable> {
+        private IntWritable result = new IntWritable();
+        
+        public void reduce(Text key, Iterable<IntWritable> values, Context context) throws IOException, InterruptedException {
+            int sum = 0;
+            for (IntWritable val : values) {
+                sum += val.get();
+            }
+            result.set(sum);
+            context.write(key, result);
+        }
+    }
+    
+    public static void main(String[] args) throws Exception {
+        Configuration conf = new Configuration();
+        Job job = Job.getInstance(conf, "log file processor");
+        
+        job.setJarByClass(LogProcessor.class);
+        job.setMapperClass(LogMapper.class);
+        job.setCombinerClass(LogReducer.class);
+        job.setReducerClass(LogReducer.class);
+        
+        job.setOutputKeyClass(Text.class);
+        job.setOutputValueClass(IntWritable.class);
+        
+        FileInputFormat.addInputPath(job, new Path(args[0]));
+        FileOutputFormat.setOutputPath(job, new Path(args[1]));
+        
+        System.exit(job.waitForCompletion(true) ? 0 : 1);
+    }
+}
+```
+
+---
+
+# 🛠 How It Works:
+
+| Part | Description |
+|:---|:---|
+| Mapper | Reads each log line, extracts the **first word** (log level), emits `(level, 1)` |
+| Reducer | Sums the counts for each log level (like `ERROR`, `INFO`, etc.) |
+
+---
+
+# 🛠 Steps to run LogProcessor:
+
+✅ Create input directory
+
+```bash
+mkdir loginput
+```
+
+✅ Add a log file:
+
+```bash
+nano loginput/log.txt
+```
+Paste sample logs:
+```
+ERROR Connection refused
+INFO User login successful
+ERROR Disk not found
+WARNING CPU usage high
+INFO User logout
+ERROR Disk not found
+```
+Save file.
+
+✅ Run the job:
+
+```bash
+hadoop jar logprocessor.jar logprocessor.LogProcessor loginput logoutput
+```
+
+✅ View the output:
+
+```bash
+cat logoutput/part-r-00000
+```
+
+Sample output:
+```
+ERROR 3
+INFO 2
+WARNING 1
+```
+
+---
+
+# 📋 Quick Command Summary (again)
+
+| Step | Command |
+|:---|:---|
+| Create input | `mkdir loginput` |
+| Add logs | `nano loginput/log.txt` |
+| Run JAR | `hadoop jar logprocessor.jar logprocessor.LogProcessor loginput logoutput` |
+| View output | `cat logoutput/part-r-00000` |
+
+---
+
+# 🛠 Project Folder Structure in Eclipse
+
+```
+LogProcessorHadoop/
+ ├── src/
+ │    └── logprocessor/
+ │           └── LogProcessor.java
+ └── Referenced Libraries (Hadoop jars)
+```
+
+---
+
+# ✅ Done!
+
+This code analyzes system logs in a **distributed Hadoop MapReduce** environment running on your **local Ubuntu machine**.
+
+---
+
+# ⚡ Bonus: 
+
+Would you like me to also show a **slightly advanced** LogProcessor version that:
+
+- Counts **different types of error messages separately**?
+- Groups **same messages** (e.g., how many times "Disk not found" appears)?
+
+🎯 It would make it much more detailed like real log analytics!
+
+If yes, just say: **"Give me advanced LogProcessor too!"** 🚀  
+I'll share it! 📚

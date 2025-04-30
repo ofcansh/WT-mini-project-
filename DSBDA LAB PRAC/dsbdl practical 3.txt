@@ -1,0 +1,33 @@
+import pandas as pd
+import seaborn as sns
+
+# Read the CSV
+df = pd.read_csv('Iris.csv')
+print(df.head())
+
+# Correct: Group by 'Species'
+grouped_stats = df.groupby('Species').agg(['mean', 'median', 'min', 'max', 'std'])
+print(grouped_stats)
+
+# Correct: species_map keys must match 'Species' values
+species_map = {'Iris-setosa': 0, 'Iris-versicolor': 1, 'Iris-virginica': 2}
+
+# Correct: use 'Species' not 'species'
+df['species_numeric'] = df['Species'].map(species_map)
+
+# Show the new column for species and its numeric equivalent
+print(df[['Species', 'species_numeric']].drop_duplicates())
+
+# Correct: use 'Species' not 'species'
+setosa = df[df['Species'] == 'Iris-setosa']
+versicolor = df[df['Species'] == 'Iris-versicolor']
+virginica = df[df['Species'] == 'Iris-virginica']
+
+# Display summary statistics for Setosa
+print("Setosa Statistics:\n", setosa.describe())
+
+# Display summary statistics for Versicolor
+print("\nVersicolor Statistics:\n", versicolor.describe())
+
+# Display summary statistics for Virginica
+print("\nVirginica Statistics:\n", virginica.describe())

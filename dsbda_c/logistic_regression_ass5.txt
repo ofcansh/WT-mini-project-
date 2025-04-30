@@ -1,0 +1,52 @@
+# 1. Import required libraries
+import pandas as pd
+import numpy as np
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LogisticRegression
+from sklearn.metrics import confusion_matrix, accuracy_score, precision_score, recall_score
+
+# 2. Load the dataset
+df = pd.read_csv('Social_Network_Ads.csv')
+
+# 3. Display first few rows
+print("\nFirst 5 rows of data:\n")
+print(df.head())
+
+# 4. Prepare the data
+# Let's assume 'Purchased' is the target variable
+X = df[['Age', 'EstimatedSalary']]  # Independent variables
+y = df['Purchased']                # Dependent variable
+
+# 5. Split into training and testing
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.25, random_state=0)
+
+# 7. Train the Logistic Regression model
+model = LogisticRegression()
+model.fit(X_train, y_train)
+
+# 8. Make predictions
+y_pred = model.predict(X_test)
+
+# 9. Confusion Matrix and Metrics
+cm = confusion_matrix(y_test, y_pred)
+
+# Extract TN, FP, FN, TP
+TN, FP, FN, TP = cm.ravel()
+
+print("\nConfusion Matrix:\n", cm)
+print(f"\nTrue Positive (TP): {TP}")
+print(f"False Positive (FP): {FP}")
+print(f"True Negative (TN): {TN}")
+print(f"False Negative (FN): {FN}")
+
+# 10. Calculate metrics
+accuracy = accuracy_score(y_test, y_pred)
+error_rate = 1 - accuracy
+precision = precision_score(y_test, y_pred)
+recall = recall_score(y_test, y_pred)
+
+print(f"\nAccuracy: {accuracy:.2f}")
+print(f"Error Rate: {error_rate:.2f}")
+print(f"Precision: {precision:.2f}")
+print(f"Recall: {recall:.2f}")
+

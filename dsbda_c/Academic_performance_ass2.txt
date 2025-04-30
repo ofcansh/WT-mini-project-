@@ -1,0 +1,54 @@
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+
+data = {
+    'StudentID': [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+    'Math_Score': [88, 92, np.nan, 45, 78, 99, 100, 67, 200, 73],  # 200 is an outlier
+    'Science_Score': [91, 85, 89, 76, 73, 95, np.nan, 77, 84, 81],
+    'English_Score': [78, 80, 72, 75, 60, 67, 59, 61, 100, 200],  # 200 is outlier
+    'Attendance_Percentage': [92, 90, 85, 88, 87, 94, 96, 70, 60, 30]  # 30 is possibly low
+}
+
+
+df = pd.DataFrame(data)
+print(df)
+
+# Check for missing values
+print(df.isnull().sum())
+df['Math_Score'].fillna(df['Math_Score'].mean(), inplace=True)
+df['Science_Score'].fillna(df['Science_Score'].mean(), inplace=True)
+
+print(df)
+
+
+# Check outliers using simple rule: value > mean + 2*std or value < mean - 2*std
+def remove_outliers_simple(df, column):
+    mean = df[column].mean()
+    std = df[column].std()
+    upper_limit = mean + 2 * std
+    lower_limit = mean - 2 * std
+    return df[(df[column] >= lower_limit) & (df[column] <= upper_limit)]
+
+# Apply this to Math and English scores
+df = remove_outliers_simple(df, 'Math_Score')
+df = remove_outliers_simple(df, 'English_Score')
+
+
+# Before transformation
+sns.histplot(df['Attendance_Percentage'], kde=True)
+plt.title("Before Log Transformation")
+plt.show()
+
+
+# Apply log transformation
+df['Log_Attendance'] = np.log(df['Attendance_Percentage'])
+
+
+# After transformation
+sns.histplot(df['Log_Attendance'], kde=True)
+plt.title("After Log Transformation")
+plt.show()
+

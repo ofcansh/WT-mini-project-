@@ -1,0 +1,65 @@
+import pandas as pd
+import numpy as np
+import seaborn as sns
+import matplotlib.pyplot as plt
+
+data={
+    'Student_ID':range(1,21),
+    'Math_Score':[88,92,80,70,65,95,85,78,90,100,45,60,75,85,95,55,65,70,80,90],
+    'Reading_Score':[85,90,78,72,68,88,82,75,89,95,50,65,70,80,90,60,70,75,85,92],
+    'Writing_Score':[80, 85, 75, 70,65,90,80,72,88,93,48,62,68,78,88,58,68,72,82,90],
+    'Attendance_Rate':[0.95,0.9,0.85,0.8,0.75,0.98,0.88,0.82,0.9,1.0,0.6,0.7,0.78,0.85,0.92,0.65,0.75,0.8,0.88,0.9]
+}
+df=pd.DataFrame(data)
+
+df.loc[3,"Math_Score"]=np.nan
+
+print("First 5 rows of the dataset:")
+print(df.head())
+
+print("Missing values in each column: ")
+print(df.isnull().sum())
+
+df['Math_Score'].fillna(df['Math_Score'].mean(),inplace=True)
+
+print("Missing values after imputation: ")
+print(df.isnull().sum())
+
+print("Updated dataset: ")
+print(df.head())
+
+numeric_columns=['Math_Score','Reading_Score','Writing_Score','Attendance_Rate']
+
+plt.figure(figsize=(8,8))
+for  i,col in enumerate(numeric_columns,1):
+    plt.subplot(2,2,i)
+    sns.boxplot(y=df[col])
+    plt.title(col)
+plt.tight_layout()
+plt.show()
+
+for col in numeric_columns:
+    Q1=df[col].quantile(0.25)
+    Q3=df[col].quantile(0.75)
+    IQR=Q3-Q1
+    lower_bound=Q1-1.5*IQR
+    upper_bound=Q3+1.5*IQR
+    
+    df[col]=df[col].clip(lower=lower_bound, upper = upper_bound)
+print("Descriptive statistics after handling outliers: ")
+print(df[numeric_columns].describe())
+
+df['Math_Score_log']=np.log(df['Math_Score'])
+
+plt.figure(figsize=(8,8))
+plt.subplot(1,2,1)
+sns.histplot(df['Math_Score'],kde=True,bins=10,color='blue')
+plt.title('original math_score distribution')
+
+plt.subplot(1,2,2)
+sns.histplot(df['Math_Score_log'],kde=True,bins=10,color='green')
+plt.title('logged math_score distribution')
+
+plt.tight_layout()
+plt.show()
+

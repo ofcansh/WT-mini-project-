@@ -1,0 +1,40 @@
+import pandas as pd
+import numpy as np
+import seaborn as sns
+import matplotlib.pyplot as plt
+from sklearn.preprocessing import LabelEncoder
+from sklearn.preprocessing import StandardScaler
+
+df=pd.read_csv('Iris.csv')
+
+print('First 5 rows of the dataset: ')
+print(df.head())
+
+print('Information about dataset: ')
+print(df.info())
+
+print('Describing the dataset: ')
+print(df.describe())
+
+print('checking for null values: ')
+print(df.isnull().sum())
+
+print('Shape of the dataset: ')
+print('Number of rows in the dataset: ',df.shape[0])
+print('Number of columns in the dataset: ',df.shape[1])
+
+le=LabelEncoder()
+df['species_encoded']=le.fit_transform(df['Species'])
+
+scaler=StandardScaler()
+numerical_features=['SepalLengthCm','SepalWidthCm','PetalLengthCm','PetalWidthCm']
+df_normalized=pd.DataFrame(scaler.fit_transform(df[numerical_features]),columns=numerical_features)
+df_normalized['species_encoded']=df['species_encoded']
+
+print('first 5 rows of normalized data: ')
+print(df_normalized.head())
+
+print('mapping of encoded values: ')
+for i,species in enumerate(le.classes_):
+    print(f"{species}:{i}")
+

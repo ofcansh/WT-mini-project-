@@ -1,0 +1,394 @@
+Alright — you want a **FULL GUIDE**, assuming you’re starting from scratch:  
+✅ Setting up Hadoop locally on Ubuntu  
+✅ Installing Eclipse  
+✅ Setting up a WordCount Java project  
+✅ Building and Running WordCount using Hadoop (terminal)  
+✅ Including full Java code too  
+
+I’ll explain step-by-step clearly!
+
+---
+
+# 🛠 FULL SETUP GUIDE: Hadoop WordCount on Ubuntu (Terminal)
+
+---
+
+# 1. Install Java
+
+```bash
+sudo apt update
+sudo apt install openjdk-11-jdk -y
+```
+Check if installed:
+```bash
+java -version
+```
+You should see something like:
+```
+openjdk version "11.0.xx" ...
+```
+
+---
+
+# 2. Install Hadoop
+
+## 2.1 Download Hadoop
+
+```bash
+cd ~
+wget https://downloads.apache.org/hadoop/common/hadoop-3.3.6/hadoop-3.3.6.tar.gz
+tar -xvzf hadoop-3.3.6.tar.gz
+mv hadoop-3.3.6 hadoop
+```
+
+Now Hadoop is extracted at: `~/hadoop/`
+
+---
+
+## 2.2 Configure Environment Variables
+
+Edit `~/.bashrc`:
+```bash
+
+nano ~/.bashrc
+```
+Add these lines **at the bottom**:
+
+```bash
+# Hadoop variables
+export HADOOP_HOME=~/hadoop
+export PATH=$PATH:$HADOOP_HOME/bin:$HADOOP_HOME/sbin
+export HADOOP_MAPRED_HOME=$HADOOP_HOME
+export HADOOP_COMMON_HOME=$HADOOP_HOME
+export HADOOP_HDFS_HOME=$HADOOP_HOME
+export YARN_HOME=$HADOOP_HOME
+export JAVA_HOME=/usr/lib/jvm/java-11-openjdk-amd64
+export HADOOP_OPTS="-Djava.library.path=$HADOOP_HOME/lib/native"
+```
+Save and exit (`Ctrl + O`, `Enter`, `Ctrl + X`).
+
+Apply changes:
+```bash
+source ~/.bashrc
+```
+
+---
+
+## 2.3 Test Hadoop Installation
+
+```bash
+hadoop version
+```
+Example output:
+```
+Hadoop 3.3.6
+...
+```
+
+---
+
+# 3. Install Eclipse
+
+Install Eclipse IDE:
+
+```bash
+sudo snap install --classic eclipse
+```
+
+Open it:
+```bash
+eclipse
+```
+
+---
+
+# 4. Create WordCount Project (using Eclipse)
+
+## 4.1 New Java Project
+
+- Eclipse ➔ `File` ➔ `New` ➔ `Java Project`
+- Name: `WordCountHadoop`
+- Click Finish ✅
+
+---
+
+## 4.2 Create Package and Class
+
+- Right-click `src` ➔ New ➔ `Package` ➔ Name it `wordcount`
+- Inside `wordcount` ➔ New ➔ `Class` ➔ Name it `WordCount`
+- ✔ Check `public static void main(String[] args)`
+
+---
+
+## 4.3 Add Hadoop JARs
+
+- Right-click Project ➔ `Properties`
+- Java Build Path ➔ `Libraries` ➔ `Add External JARs`
+- Add all JAR files from:
+  - `~/hadoop/share/hadoop/common/*.jar`
+  - `~/hadoop/share/hadoop/common/lib/*.jar`
+  - `~/hadoop/share/hadoop/mapreduce/*.jar`
+  - `~/hadoop/share/hadoop/hdfs/*.jar`
+  - `~/hadoop/share/hadoop/yarn/*.jar`
+
+(*Select multiple using Ctrl*)
+
+---
+
+# 5. WordCount.java Code (Paste into Eclipse)
+
+```java
+package wordcount;
+
+import java.io.IOException;
+import java.util.StringTokenizer;
+
+import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.fs.Path;
+import org.apache.hadoop.io.IntWritable;
+import org.apache.hadoop.io.Text;
+import org.apache.hadoop.mapreduce.Job;
+import org.apache.hadoop.mapreduce.Mapper;
+import org.apache.hadoop.mapreduce.Reducer;
+import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
+import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
+
+public class WordCount {
+
+    public static class TokenizerMapper extends Mapper<Object, Text, Text, IntWritable> {
+        private final static IntWritable one = new IntWritable(1);
+        private Text word = new Text();
+        
+        public void map(Object key, Text value, Context context) throws IOException, InterruptedException {
+            StringTokenizer itr = new StringTokenizer(value.toString());
+            while (itr.hasMoreTokens()) {
+                word.set(itr.nextToken());
+                context.write(word, one);
+            }
+        }
+    }
+
+    public static class IntSumReducer extends Reducer<Text, IntWritable, Text, IntWritable> {
+        private IntWritable result = new IntWritable();
+        
+        public void reduce(Text key, Iterable<IntWritable> values, Context context)
+                throws IOException, InterruptedException {
+            int sum = 0;
+            for (IntWritable val : values) {
+                sum += val.get();
+            }
+            result.set(sum);
+            context.write(key, result);
+        }
+    }
+    
+    public static void main(String[] args) throws Exception {
+        Configuration conf = new Configuration();
+        Job job = Job.getInstance(conf, "word count");
+        
+        job.setJarByClass(WordCount.class);
+        job.setMapperClass(TokenizerMapper.class);
+        job.setCombinerClass(IntSumReducer.class); 
+        job.setReducerClass(IntSumReducer.class);
+        
+        job.setOutputKeyClass(Text.class);
+        job.setOutputValueClass(IntWritable.class);
+        
+        FileInputFormat.addInputPath(job, new Path(args[0]));
+        FileOutputFormat.setOutputPath(job, new Path(args[1]));
+        
+        System.exit(job.waitForCompletion(true) ? 0 : 1);
+    }
+}
+```
+
+---
+
+# 6. Export JAR file from Eclipse
+
+- Right-click Project ➔ `Export`
+- Select `Runnable JAR File`
+- Select WordCount class and Export location:
+  e.g., `/home/yourname/wordcount.jar`
+- Select: `Package required libraries into generated jar`
+- Click Finish ✅
+
+---
+
+# 7. Running WordCount from Ubuntu Terminal
+
+## 7.1 Create Input Directory and Test File
+
+```bash
+mkdir input
+echo "Hello Hadoop Hello World" > input/test.txt
+```
+
+---
+
+## 7.2 Run WordCount JAR using Hadoop
+
+```bash
+hadoop jar wordcount.jar wordcount.WordCount input output
+```
+
+✅ It will process `input/test.txt` and generate output files under `output/` folder.
+
+---
+
+## 7.3 View the Output
+
+```bash
+cat output/part-r-00000
+```
+
+Output should be like:
+```
+Hadoop 1
+Hello 2
+World 1
+```
+
+🎉 Congratulations! You have run Hadoop WordCount job on your Ubuntu locally!
+
+---
+
+# 📋 Quick Command Summary (Cheat Sheet)
+
+| Step | Command |
+|:---|:---|
+| Install Java | `sudo apt install openjdk-11-jdk` |
+| Download Hadoop | `wget ...` + `tar -xvzf ...` |
+| Set ENV Variables | Edit `~/.bashrc` |
+| Verify Hadoop | `hadoop version` |
+| Install Eclipse | `sudo snap install eclipse` |
+| Create Java Project | Eclipse GUI |
+| Add Hadoop JARs | Eclipse GUI |
+| Export Jar | Eclipse ➔ Export ➔ Runnable Jar |
+| Run WordCount | `hadoop jar wordcount.jar wordcount.WordCount input output` |
+
+---
+
+# ✅ ALL Steps Completed!
+
+---
+
+Would you also like me to show you how to **automate the input/output folder cleanup** and **re-run** Hadoop job again and again for faster testing? 🚀  
+(Useful when you need to modify code and test quickly.)  
+Just say! 📚
+
+
+
+Of course!  
+I'll give you the **full sample run** including input file, execution, and final output exactly how it looks on Ubuntu Terminal after running WordCount.
+
+---
+
+# 🛠 Let's Assume:
+
+We created the following input file:
+
+```bash
+mkdir input
+echo "Hello Hadoop Hello World Hadoop" > input/test.txt
+```
+
+Inside `test.txt`:
+```
+Hello Hadoop Hello World Hadoop
+```
+
+---
+
+# 🛠 Command to Run the WordCount Job:
+
+```bash
+hadoop jar wordcount.jar wordcount.WordCount input output
+```
+
+✅ Hadoop will run your `WordCount` program.
+✅ Output will be created inside the `output/` directory.
+
+---
+
+# 🛠 See the Output:
+
+To see output:
+
+```bash
+cat output/part-r-00000
+```
+
+👉 You will see:
+
+```
+Hadoop 2
+Hello 2
+World 1
+```
+
+---
+
+# 🛠 Full Explanation:
+
+| Word | Occurrences |
+|:----|:------------|
+| Hadoop | 2 times |
+| Hello | 2 times |
+| World | 1 time |
+
+The program tokenizes based on spaces and counts each word frequency.
+
+---
+
+# 🛠 How Your Terminal will Look Step-by-Step
+
+```bash
+# Create input
+mkdir input
+echo "Hello Hadoop Hello World Hadoop" > input/test.txt
+
+# Run WordCount
+hadoop jar wordcount.jar wordcount.WordCount input output
+
+# View output
+cat output/part-r-00000
+```
+
+**Sample Terminal Output:**
+```
+Hadoop 2
+Hello 2
+World 1
+```
+
+---
+
+# ❗ Important: If you re-run WordCount again
+
+If `output/` already exists, Hadoop will throw an error:
+
+```
+org.apache.hadoop.mapred.FileAlreadyExistsException: Output directory output already exists
+```
+
+Before rerunning, delete the old output:
+
+```bash
+rm -r output
+```
+
+---
+
+# ✅ In Short:
+1. **Create input** ➔ `mkdir input`
+2. **Add text** ➔ `echo "..." > input/test.txt`
+3. **Run WordCount JAR** ➔ `hadoop jar ...`
+4. **View output** ➔ `cat output/part-r-00000`
+5. **(Next time)** ➔ `rm -r output` before running again
+
+---
+
+Would you also like me to show you an improved version of the WordCount (ignoring punctuation, handling case-insensitivity like "Hello" and "hello" treated same)? 🚀  
+It makes WordCount *production quality*!  
+Let me know! 📚

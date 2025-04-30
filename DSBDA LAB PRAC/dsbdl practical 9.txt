@@ -1,0 +1,26 @@
+# Import libraries
+import seaborn as sns
+import matplotlib.pyplot as plt
+import pandas as pd;
+
+# Load Titanic dataset
+df = pd.read_csv('titanic.csv')
+
+# Show first 5 rows
+df.head()
+# Plot boxplot
+plt.figure(figsize=(10,6))
+sns.boxplot(x='Sex', y='Age', hue='Survived', data=df, palette='Set2')
+plt.title('Age Distribution by Gender and Survival Status')
+plt.xlabel('Gender')
+plt.ylabel('Age')
+plt.show()
+
+print("""
+Observations:
+- Females had higher survival rates across almost all age groups.
+- Males had lower survival rates, especially in the 20-40 age group.
+- Younger passengers (children) had better survival chances compared to older passengers.
+- Outliers are visible, especially among older ages.
+""")
+

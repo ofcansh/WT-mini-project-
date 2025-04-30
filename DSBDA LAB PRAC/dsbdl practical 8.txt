@@ -1,0 +1,44 @@
+# Import libraries
+import pandas as pd
+import seaborn as sns
+import matplotlib.pyplot as plt
+
+# Load Titanic dataset
+df = pd.read_csv('titanic.csv')
+
+# Display the first few rows
+df.head()
+
+# Countplot: Survival count based on gender
+sns.countplot(x='Sex', hue='Survived', data=df, palette='Set2')
+plt.title('Survival Count Based on Gender')
+plt.xlabel('Gender')
+plt.ylabel('Count')
+plt.show()
+
+# Countplot: Survival count based on passenger class
+sns.countplot(x='Pclass', hue='Survived', data=df, palette='Set1')
+plt.title('Survival Count Based on Passenger Class')
+plt.xlabel('Passenger Class')
+plt.ylabel('Count')
+plt.show()
+
+# Histplot: Age distribution
+sns.histplot(df['Age'].dropna(), bins=30, kde=True, color='skyblue')
+plt.title('Age Distribution of Passengers')
+plt.xlabel('Age')
+plt.ylabel('Number of Passengers')
+plt.show()
+
+# Histplot: Fare distribution
+sns.histplot(df['Fare'], bins=30, kde=True, color='salmon')
+plt.title('Ticket Fare Distribution')
+plt.xlabel('Fare')
+plt.ylabel('Number of Passengers')
+plt.show()
+
+# Observations
+print("""
+- Most passengers paid a lower fare (under 100), but a few outliers paid very high ticket prices.
+- Higher-class passengers (1st class) generally had higher fares and better survival chances.
+""")

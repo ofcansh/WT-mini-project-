@@ -1,0 +1,31 @@
+import pandas as pd
+import seaborn as sns
+
+
+df = sns.load_dataset("tips")
+
+df.head
+
+# Group by 'day' and describe numeric columns
+grouped_stats = df.groupby('day')['total_bill'].agg(['mean', 'median', 'min', 'max', 'std'])
+print(grouped_stats)
+
+stats_by_species = df.groupby('day').describe()
+print(stats_by_species)
+# For each species, get detailed stats
+for day in df['day'].unique():
+    print(f"\nStatistics for {day.capitalize()}:")
+    print(df[df['day'] == day].describe())
+
+df['total_bill'].mean
+
+df['tip'].mean()
+
+
+df['tip'].median()
+
+
+df['tip'].mode()
+
+
+df['tip'].std()

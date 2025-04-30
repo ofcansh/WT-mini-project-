@@ -1,0 +1,37 @@
+import matplotlib.pyplot as plt
+import seaborn as sns
+import pandas as pd 
+
+
+df = pd.read_csv("https://raw.githubusercontent.com/shrikant-temburwar/Iris-Dataset/master/Iris.csv")
+df.head(10)
+
+# Step 1: Compute correlation matrix
+corr_matrix = df.corr(numeric_only=True)
+
+# Step 2: Create the heatmap
+plt.figure(figsize=(8, 6))
+sns.heatmap(corr_matrix, annot=True, cmap='coolwarm', linewidths=0.5)
+
+
+
+df.hist(figsize=(10, 8), color='skyblue', edgecolor='black')
+plt.suptitle('Histograms of Iris Features')
+plt.show()
+
+print(df.columns)
+
+sns.histplot(x=df['SepalLengthCm'], kde=True)
+
+sns.boxplot(x='SepalWidthCm', data=df)
+plt.show()
+sns.boxplot(x='SepalLengthCm', data=df)
+plt.show()
+sns.boxplot(x='PetalWidthCm', data=df)
+plt.show()
+sns.boxplot(x='PetalLengthCm', data=df)
+plt.show()
+sns.boxplot(x="Species", y="SepalWidthCm", data=df)
+sns.boxplot(x="Species", y="SepalLengthCm", data=df)
+sns.boxplot(x="Species", y="PetalWidthCm", data=df)
+sns.boxplot(x="Species", y="PetalLengthCm", data=df)

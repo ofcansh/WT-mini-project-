@@ -1,0 +1,124 @@
+spark-shell
+1.
+import org.apache.spark.sql.SparkSession
+
+object NumberSign {
+  def main(args: Array[String]): Unit = {
+    // Create Spark session
+    val spark = SparkSession.builder()
+      .appName("Number Sign Check")
+      .master("local[*]")
+      .getOrCreate()
+
+    // Take user input
+    println("Enter a number:")
+    val number = scala.io.StdIn.readInt()
+
+    // Check if the number is positive, negative, or zero
+    if (number > 0) {
+      println(s"$number is a Positive Number.")
+    } else if (number < 0) {
+      println(s"$number is a Negative Number.")
+    } else {
+      println("The number is Zero.")
+    }
+
+    // Stop the Spark session
+    spark.stop()
+  }
+}
+
+NumberSign.main(Array())
+
+2.
+import org.apache.spark.sql.SparkSession
+
+object Calculator {
+
+  // Creating a Spark session
+  val spark = SparkSession.builder()
+    .appName("Simple Calculator")
+    .master("local[*]")
+    .getOrCreate()
+
+  def main(args: Array[String]): Unit = {
+
+    // Print calculator options
+    println("Simple Calculator")
+    println("Choose an operation:")
+    println("1. Addition")
+    println("2. Subtraction")
+    println("3. Multiplication")
+    println("4. Division")
+
+    // Read user input for operation choice
+    val choice = scala.io.StdIn.readInt()
+
+    // Input two numbers from the user
+    println("Enter first number: ")
+    val num1 = scala.io.StdIn.readDouble()
+    println("Enter second number: ")
+    val num2 = scala.io.StdIn.readDouble()
+
+    // Perform the operation based on user input
+    choice match {
+      case 1 => 
+        val result = num1 + num2
+        println(s"Result: $num1 + $num2 = $result")
+      case 2 => 
+        val result = num1 - num2
+        println(s"Result: $num1 - $num2 = $result")
+      case 3 => 
+        val result = num1 * num2
+        println(s"Result: $num1 * $num2 = $result")
+      case 4 => 
+        if (num2 != 0) {
+          val result = num1 / num2
+          println(s"Result: $num1 / $num2 = $result")
+        } else {
+          println("Error: Division by zero is not allowed.")
+        }
+      case _ => 
+        println("Invalid choice. Please select a valid operation.")
+    }
+
+    // Stop Spark session
+    spark.stop()
+  }
+}
+Calculator.main(Array())
+
+3.
+import org.apache.spark.sql.SparkSession
+
+object PrimeNumber {
+  def main(args: Array[String]): Unit = {
+    // Create Spark session
+    val spark = SparkSession.builder()
+      .appName("Prime Number Check")
+      .master("local[*]")
+      .getOrCreate()
+
+
+    // Take user input
+    println("Enter a number:")
+    val number = scala.io.StdIn.readInt()
+
+    // Check if the number is prime
+    val isPrime = (num: Int) => {
+      if (num <= 1) false
+      else !(2 to Math.sqrt(num).toInt).exists(x => num % x == 0)
+    }
+
+    // Output result
+    if (isPrime(number)) {
+      println(s"$number is a Prime Number.")
+    } else {
+      println(s"$number is not a Prime Number.")
+    }
+
+    // Stop the Spark session
+    spark.stop()
+  }
+}
+PrimeNumber.main(Array())

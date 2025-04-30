@@ -1,0 +1,44 @@
+# Step 1: Import all required libraries
+import pandas as pd  # for working with data
+import numpy as np   # for numbers and calculations
+
+# Step 2: Load the Dataset
+# You need to download the "train.csv" from Kaggle Titanic Dataset and put it in the same folder as your Python file
+data = pd.read_csv('train.csv')
+
+# Step 3: See basic information
+print("First 5 rows of the data:")
+print(data.head())  # shows the first 5 rows
+
+# Step 4: Check for missing values
+print("\nMissing values in each column:")
+print(data.isnull().sum())
+
+# Step 5: Get some basic statistics
+print("\nSummary statistics of the data:")
+print(data.describe())
+
+# Step 6: Get information about types of data
+print("\nInformation about data types:")
+print(data.info())
+
+# Step 7: Dimensions of data
+print("\nShape of data (rows, columns):")
+print(data.shape)
+
+# Step 8: Data Formatting / Type Conversion
+# Example: 'Pclass' should be integer, let's make sure
+data['Pclass'] = data['Pclass'].astype(int)
+
+# Step 9: Turn Categorical Variables into Numeric
+# Example: 'Sex' column has 'male' and 'female'
+# We can change it to 0 (male) and 1 (female)
+data['Sex'] = data['Sex'].map({'male': 0, 'female': 1})
+
+# Another example: 'Embarked' column (port of boarding)
+# We will use "get_dummies" to turn into numbers
+data = pd.get_dummies(data, columns=['Embarked'])
+
+# Step 10: See final cleaned data
+print("\nData after cleaning and converting:")
+print(data.head())

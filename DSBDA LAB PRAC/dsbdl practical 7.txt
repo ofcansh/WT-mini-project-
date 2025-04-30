@@ -1,0 +1,35 @@
+import nltk
+from nltk.tokenize import word_tokenize
+from nltk.corpus import stopwords
+from nltk.stem import PorterStemmer,WordNetLemmatizer
+from sklearn.feature_extraction.text import TfidfVectorizer
+
+nltk.download('punkt')
+nltk.download('averaged_percptron_tagger')
+nltk.download('stopwords')
+nltk.download('wordnet')
+nltk.download('omw-1.4')
+
+text='Data science is fun. It helps in analyzing data and making predictions.'
+
+tokens=word_tokenize(text)
+print("tokens: ",tokens)
+
+print('pos tags: ',nltk.pos_tag(tokens))
+
+stop_words=set(stopwords.words('english'))
+filtered=[w for w in tokens if w.lower() not in stop_words]
+print('filterd: ',filtered)
+
+stemmed=[PorterStemmer().stem(w) for w in filtered]
+print('stemmed: ',stemmed)
+
+lemmatize=[WordNetLemmatizer().lemmatize(w) for w in filtered]
+print('lemmatize: ',lemmatize)
+
+docs=[text,'Big Data helps in finding patterns.']
+vectorizer=TfidfVectorizer()
+tfidf_matrix=vectorizer.fit_transform(docs)
+print('tf-idf matrix: ',tfidf_matrix.toarray())
+print('words: ',vectorizer.get_feature_names_out())
+

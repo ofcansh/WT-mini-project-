@@ -1,0 +1,57 @@
+import nltk
+from nltk.tokenize import word_tokenize
+from nltk.corpus import stopwords
+from nltk.stem import PorterStemmer, WordNetLemmatizer
+from nltk import pos_tag
+import string
+from sklearn.feature_extraction.text import TfidfVectorizer
+
+# Download required NLTK data (only needed once)
+nltk.download('punkt')
+nltk.download('averaged_perceptron_tagger')
+nltk.download('stopwords')
+nltk.download('wordnet')
+nltk.download('omw-1.4')
+
+# Sample documents
+documents = [
+    "The Titanic was a huge ship that tragically sank in the ocean.",
+    "Many passengers did not survive the disaster.",
+    "Survivors were rescued by a nearby ship."
+]
+
+# Text Preprocessing on first document
+text = documents[0]
+
+# Tokenization
+tokens = word_tokenize(text)
+
+# POS Tagging
+pos_tags = pos_tag(tokens)
+
+# Stop Words Removal
+stop_words = set(stopwords.words('english'))
+filtered_tokens = [word for word in tokens if word.lower() not in stop_words and word not in string.punctuation]
+
+# Stemming
+stemmer = PorterStemmer()
+stemmed = [stemmer.stem(word) for word in filtered_tokens]
+
+# Lemmatization
+lemmatizer = WordNetLemmatizer()
+lemmatized = [lemmatizer.lemmatize(word) for word in filtered_tokens]
+
+# Print results
+print("Original Tokens:", tokens)
+print("POS Tags:", pos_tags)
+print("Filtered Tokens:", filtered_tokens)
+print("Stemmed:", stemmed)
+print("Lemmatized:", lemmatized)
+
+# TF-IDF Calculation for all documents
+vectorizer = TfidfVectorizer(stop_words='english')
+tfidf_matrix = vectorizer.fit_transform(documents)
+
+# Display TF-IDF matrix
+print("\nTF-IDF Feature Names:", vectorizer.get_feature_names_out())
+print("TF-IDF Matrix:\n", tfidf_matrix.toarray())
